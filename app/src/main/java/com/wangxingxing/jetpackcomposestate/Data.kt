@@ -25,6 +25,7 @@ enum class TodoIcon(
     val imageVector: ImageVector, // 矢量图
     @StringRes val contentDescription: Int // 图标的文字描述
 ) {
+    // LingJie's Mark: CropSquare是Icons.Filled的扩展属性
     Square(Icons.Default.CropSquare, R.string.cd_expand),
     Done(Icons.Default.Done, R.string.cd_done),
     Event(Icons.Default.Event, R.string.cd_event),
