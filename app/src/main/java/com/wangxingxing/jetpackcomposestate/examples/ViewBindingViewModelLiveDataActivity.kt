@@ -25,9 +25,11 @@ class ViewBindingViewModelLiveDataActivity : AppCompatActivity() {
         }*/
 
         // ViewModel + LiveData
+        // 事件“向上”流动到ViewModel
         binding.etInput.doAfterTextChanged {
             viewModel.onTextChanged(it.toString())
         }
+        // 状态“向下”流动到Activity
         viewModel.text.observe(this) {
             binding.tvShow.text = it
         }
