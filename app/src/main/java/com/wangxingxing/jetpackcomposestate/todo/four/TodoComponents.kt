@@ -63,7 +63,7 @@ fun TodoItemInlineEditor(
                 modifier = shrinkButtons
             ) {
                 Text(
-                    text = "\uD83D\uDCBE",  // 软盘
+                    text = "\uD83D\uDCBE",  // LingJie's Mark: 软盘（Emoji表情符号）
                     textAlign = TextAlign.End,
                     modifier = Modifier.widthIn(30.dp)
                 )

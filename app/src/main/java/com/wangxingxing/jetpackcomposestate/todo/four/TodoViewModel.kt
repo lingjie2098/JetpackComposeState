@@ -19,7 +19,10 @@ class TodoViewModel : ViewModel() {
     // 当前正在编辑的TodoItem的索引位置
     private var currentEditPosition by mutableStateOf(-1)
 
+    // LingJie's Mark: 与one/TodoViewModel.kt比对。
+
     // TodoItem集合只读
+    // LingJie's Mark: var + private set 等效 val。mutableStateListOf表示todoItems可观察，一旦todoItems中的元素发生增、减、换都生效，但是元素内部变更是不生效的。
     var todoItems = mutableStateListOf<TodoItem>()
         private set
 

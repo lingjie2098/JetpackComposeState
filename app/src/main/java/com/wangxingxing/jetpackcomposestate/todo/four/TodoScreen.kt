@@ -36,17 +36,14 @@ fun TodoScreen(
     onEditDone: () -> Unit
 ) {
     Column {
-        // 当currentlyEditing（当前编辑条目）为空时，显示添加输入框
-        // 否则进入编辑状态时，最顶部会显示 “Editing item”文本
-        val enableTopSelection = currentEditing == null
         TodoItemInputBackground(
             elevate = true
         ) {
-            // Add 添加模式
-            if (enableTopSelection) {
+            if (currentEditing == null) {
+                // LingJie's Mark: 顶部的文本编辑框
                 TodoItemEntryInput(onAddItem)
             } else {
-                // 编辑模式
+                // LingJie's Mark: 顶部的文本框。当下方列表项中有条目正在编辑时显示。
                 Text(
                     text = "Editing item",
                     style = MaterialTheme.typography.h6,
@@ -65,8 +62,8 @@ fun TodoScreen(
             contentPadding = PaddingValues(top = 8.dp)
         ) {
             items(items = items) { todo ->
-                // 当前条目被选中，进入编辑状态
                 if (currentEditing?.id == todo.id) {
+                    // LingJie's Mark: 条目编辑模式
                     TodoItemInlineEditor(
                         item = currentEditing,
                         onEditItemChange = onEditItemChange,
@@ -76,7 +73,7 @@ fun TodoScreen(
                 } else {
                     TodoRow(
                         todo = todo,
-                        onItemClicked = { onStartEdit(it) },
+                        onItemClicked = { onStartEdit(it) },// LingJie's Mark: 点击进入条目编辑模式
                         modifier = Modifier.fillParentMaxWidth()
                     )
                 }
