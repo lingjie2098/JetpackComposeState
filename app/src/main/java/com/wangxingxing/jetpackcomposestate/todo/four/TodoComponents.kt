@@ -26,9 +26,11 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.wangxingxing.jetpackcomposestate.TodoIcon
 import com.wangxingxing.jetpackcomposestate.TodoItem
+import com.wangxingxing.jetpackcomposestate.ui.theme.JetpackComposeStateTheme
 
 /**
  * 当TodoItem列表中的条目被选中时，会弹出一个输入框，用于编辑选中TodoItem的信息
@@ -39,46 +41,46 @@ import com.wangxingxing.jetpackcomposestate.TodoItem
  */
 @Composable
 fun TodoItemInlineEditor(
+    // LingJie's Mark: 状态提升
     item: TodoItem,
     onEditItemChange: (TodoItem) -> Unit,
+
     onEditDone: () -> Unit,
     onRemoveItem: () -> Unit
 ) {
     TodoItemInput(
         text = item.task,
         onTextChange = { onEditItemChange(item.copy(task = it)) },
-        icon = item.icon,
-        onIconChange = { onEditItemChange(item.copy(icon = it)) },
-        submit = onEditDone,
-        iconVisible = true,
-        buttonSlot = {
-            // 保存和删除两个图标
-            Row {
-                val shrinkButtons = Modifier.widthIn(20.dp)
-                TextButton(
-                    onClick = onEditDone,
-                    modifier = shrinkButtons
-                ) {
-                    Text(
-                        text = "\uD83D\uDCBE",  // 软盘
-                        textAlign = TextAlign.End,
-                        modifier = Modifier.widthIn(30.dp)
-                    )
-                }
+        selectedIcon = item.icon,
+        onSelectedIconChange = { onEditItemChange(item.copy(icon = it)) },
+    ) {
+        // 保存和删除两个图标
+        Row {
+            val shrinkButtons = Modifier.widthIn(20.dp)
 
-                TextButton(
-                    onClick = onRemoveItem,
-                    modifier = shrinkButtons
-                ) {
-                    Text(
-                        text = "❌",
-                        textAlign = TextAlign.End,
-                        modifier = Modifier.widthIn(30.dp)
-                    )
-                }
+            TextButton(
+                onClick = onEditDone,
+                modifier = shrinkButtons
+            ) {
+                Text(
+                    text = "\uD83D\uDCBE",  // 软盘
+                    textAlign = TextAlign.End,
+                    modifier = Modifier.widthIn(30.dp)
+                )
+            }
+
+            TextButton(
+                onClick = onRemoveItem,
+                modifier = shrinkButtons
+            ) {
+                Text(
+                    text = "❌",
+                    textAlign = TextAlign.End,
+                    modifier = Modifier.widthIn(30.dp)
+                )
             }
         }
-    )
+    }
 }
 
 // 顶部输入框加上一个灰色背景
@@ -165,7 +167,7 @@ fun TodoItemEntryInput(onItemComplete: (TodoItem) -> Unit) {
     // icon 是当前选中的图标
     val (icon, setIcon) = remember { mutableStateOf(TodoIcon.Default) }
     // IconRow是否可见取决于文本框中是否有文本
-    val iconVisible = text.isNotBlank()
+    val animIconRowVisible = text.isNotBlank()
     // 点击“Add”按钮，提交要做的事情
     val submit = {
         onItemComplete(TodoItem(text, icon))
@@ -176,10 +178,9 @@ fun TodoItemEntryInput(onItemComplete: (TodoItem) -> Unit) {
     TodoItemInput(
         text = text,
         onTextChange = setText,
-        icon = icon,
-        onIconChange = setIcon,
-        submit = submit,
-        iconVisible = iconVisible
+        selectedIcon = icon,
+        onSelectedIconChange = setIcon,
+        animIconRowVisible = animIconRowVisible
     ) {
         TodoEditButton(
             onClick = submit,
@@ -189,17 +190,20 @@ fun TodoItemEntryInput(onItemComplete: (TodoItem) -> Unit) {
     }
 }
 
-
+/**
+ * @param endContent: 最右侧的控件。比如：编辑时有保存和删除两个按钮；添加时有添加按钮
+ */
 @Composable
 fun TodoItemInput(
     text: String,
     onTextChange: (String) -> Unit,
-    icon: TodoIcon,
-    onIconChange: (TodoIcon) -> Unit,
-    submit: () -> Unit,
-    iconVisible: Boolean,
-    // 最右侧的图标与按钮，在编辑时，会有删除和保存两个图标，添加时会有一个“Add”按钮
-    buttonSlot: @Composable () -> Unit
+
+    // LingJie's Mark: 状态提升
+    selectedIcon: TodoIcon,
+    onSelectedIconChange: (TodoIcon) -> Unit,
+
+    animIconRowVisible: Boolean = true,
+    endContent: @Composable () -> Unit
 ) {
 
     Column {
@@ -218,42 +222,47 @@ fun TodoItemInput(
 
             Spacer(modifier = Modifier.width(8.dp))
             Box(Modifier.align(Alignment.CenterVertically)) {
-                buttonSlot()
+                endContent()
             }
 
         }
 
-        if (iconVisible) {
+        if (animIconRowVisible) {
             AnimatedIconRow(
-                icon = icon,
-                onIconChange = onIconChange,
+                selectedIcon = selectedIcon,
+                onSelectedIconChange = onSelectedIconChange,
                 modifier = Modifier.padding(top = 8.dp)
             )
         }
     }
 }
 
-// 一排图标，根据文本框是否有内容，自动收起和弹出，带动画效果
+/**
+ * 一排图标，根据文本框是否有内容，自动收起和弹出，带动画效果
+ */
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun AnimatedIconRow(
-    icon: TodoIcon,
-    onIconChange: (TodoIcon) -> Unit,
+    // LingJie's Mark: 状态提升
+    selectedIcon: TodoIcon,
+    onSelectedIconChange: (TodoIcon) -> Unit,
+
     modifier: Modifier = Modifier,
     visible: Boolean = true
 ) {
-    // 动画
+    // LingJie's Mark: 淡入淡出
     val enter = remember { fadeIn(animationSpec = TweenSpec(300, easing = FastOutLinearInEasing)) }
     val exit = remember { fadeOut(animationSpec = TweenSpec(100, easing = FastOutSlowInEasing)) }
     Box(modifier.defaultMinSize(minHeight = 16.dp)) {
+        // LingJie's Mark: 显示隐藏时的动画
         AnimatedVisibility(
             visible = visible,
             enter = enter,
             exit = exit
         ) {
             IconRow(
-                icon = icon,
-                onIconChange = onIconChange
+                selectedIcon = selectedIcon,
+                onSelectedIconChange = onSelectedIconChange
             )
         }
     }
@@ -261,8 +270,10 @@ fun AnimatedIconRow(
 
 @Composable
 fun IconRow(
-    icon: TodoIcon,
-    onIconChange: (TodoIcon) -> Unit,
+    // LingJie's Mark: 状态提升
+    selectedIcon: TodoIcon,
+    onSelectedIconChange: (TodoIcon) -> Unit,
+
     modifier: Modifier = Modifier
 ) {
     Row(modifier) {
@@ -270,19 +281,25 @@ fun IconRow(
             SelectableIconButton(
                 icon = todoIcon.imageVector,
                 iconContentDescription = todoIcon.contentDescription,
-                onIconSelected = { onIconChange(todoIcon) },
-                isSelected = (todoIcon == icon),  // icon 选中的icon（state）
+                onIconSelected = { onSelectedIconChange(todoIcon) },
+                isSelected = (todoIcon == selectedIcon),  // icon 选中的icon（state）
             )
         }
     }
 }
 
+/**
+ * 图标的选中影响①②③和TodoViewModel的状态，所以状态提升到TodoActivityScreen()函数。
+ */
 @Composable
 private fun SelectableIconButton(
     icon: ImageVector,
     @StringRes iconContentDescription: Int,
+
+    // LingJie's Mark: 状态提升
     onIconSelected: () -> Unit,
     isSelected: Boolean,
+
     modifier: Modifier = Modifier
 ) {
     val tint = if (isSelected) {
@@ -291,16 +308,17 @@ private fun SelectableIconButton(
         MaterialTheme.colors.onSurface.copy(alpha = 0.6f)
     }
     TextButton(
-        onClick = { onIconSelected() },
+        onClick = { onIconSelected() }, // ①
         shape = CircleShape,
         modifier = Modifier
     ) {
         Column {
             Icon(
                 imageVector = icon,
-                tint = tint,
+                tint = tint,    // ②
                 contentDescription = stringResource(id = iconContentDescription)
             )
+            // ③
             if (isSelected) {
                 Box(
                     modifier
@@ -327,11 +345,10 @@ fun TodoItemInputPreview() {
     }
 }*/
 
-/*
 @Preview
 @Composable
 fun AnimatedIconRowPreview() {
     JetpackComposeStateTheme {
-        AnimatedIconRow()
+        AnimatedIconRow(TodoIcon.Default, {})
     }
-}*/
+}
