@@ -63,13 +63,15 @@ fun TodoInputText(
         colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent),
         maxLines = 1,
         modifier = modifier,
-        // 配置软键盘
+        // LingJie's Mark: 配置软键盘右下角按键为【完成】状态
         keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
-        keyboardActions = KeyboardActions(onDone = {
-            onImeAction()
-            //点击完成之后，隐藏键盘
-            keyboardController?.hide()
-        })
+        // LingJie's Mark: 点击【完成】后，执行业务逻辑并且隐藏软键盘
+        keyboardActions = KeyboardActions(
+            onDone = {
+                onImeAction()
+                keyboardController?.hide()
+            }
+        )
     )
 }
 
@@ -119,7 +121,8 @@ fun TodoItemInput(onItemComplete: (TodoItem) -> Unit) {
                 onTextChange = setText,
                 modifier = Modifier
                     .weight(1f)
-                    .padding(end = 8.dp)
+                    .padding(end = 8.dp),
+                onImeAction = submit
             )
 
             TodoEditButton(
