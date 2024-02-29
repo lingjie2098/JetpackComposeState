@@ -72,8 +72,7 @@ fun TodoItemInput(onItemComplete: (TodoItem) -> Unit) {
             // LingJie's Mark: mutableStateOf 会创建可观察的 MutableState<T>，后者是与 Compose 运行时集成的可观察类型。即如果 value 有任何变化，系统就会为读取 value 的所有可组合函数安排重组。
             mutableStateOf("")
         }
-    // ①
-//    var text by remember { mutableStateOf("") }
+//    var text by remember { mutableStateOf("") } // ①
     Column {
         Row(
             modifier = Modifier
@@ -82,8 +81,7 @@ fun TodoItemInput(onItemComplete: (TodoItem) -> Unit) {
         ) {
             TodoInputText(
                 text = text,
-                // ②
-//                onTextChange = { text = it },
+//                onTextChange = { text = it },   // ②
                 onTextChange = setText,
                 modifier = Modifier
                     .weight(1f)
@@ -93,8 +91,7 @@ fun TodoItemInput(onItemComplete: (TodoItem) -> Unit) {
             TodoEditButton(
                 onClick = {
                     onItemComplete(TodoItem(text))
-                    // ③
-//                    text = ""
+//                    text = ""   // ③
                     setText("")
                 },
                 text = "Add",
