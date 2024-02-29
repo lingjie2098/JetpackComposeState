@@ -49,7 +49,12 @@ fun TodoItemInputBackground(
     content: @Composable RowScope.() -> Unit
 ) {
     // 帧动画的形式展现Surface底部的阴影
-    val animatedElevation by animateDpAsState(if (elevate) 1.dp else 0.dp, TweenSpec(500))
+    // LingJie's Mark: animatedElevation从0变化到targetValue，持续500ms。参考https://www.zhihu.com/tardis/bd/art/578277565
+    val animatedElevation by animateDpAsState(
+        // LingJie's Mark: 0.dp：不展现Surface底部的阴影
+        targetValue = if (elevate) 1.dp else 0.dp,
+        animationSpec = TweenSpec(500)
+    )
     Surface(
         color = MaterialTheme.colors.onSurface.copy(alpha = 0.05f),
         shape = RectangleShape,
@@ -57,6 +62,7 @@ fun TodoItemInputBackground(
         elevation = animatedElevation
     ) {
         Row(
+            // LingJie's Mark: animateContentSize：当Row的尺寸发生变化时显示动画。参考https://blog.csdn.net/EthanCo/article/details/129383017
             modifier = modifier.animateContentSize(animationSpec = TweenSpec(300)),
             content = content
         )
