@@ -26,13 +26,13 @@ import com.wangxingxing.jetpackcomposestate.ui.theme.JetpackComposeStateTheme
 
 private const val TAG = "TodoComponents"
 
-//输入框
 @Composable
 fun TodoInputText(
     text: String,
     onTextChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    // LingJie's Mark: TextField等效EditText
     TextField(
         value = text,
         onValueChange = onTextChange,
@@ -49,6 +49,7 @@ fun TodoEditButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true
 ) {
+    // LingJie's Mark: Button用于明显的操作；TextButton用于不明显（less-pronounced）的操作
     TextButton(
         onClick = onClick,
         shape = CircleShape,
@@ -62,11 +63,17 @@ fun TodoEditButton(
 
 @Composable
 fun TodoItemInput(onItemComplete: (TodoItem) -> Unit) {
-    // 这个函数使用 remember 给自己添加内存，然后在内存中存储一个由 mutableStateOf 创建的 MutableState<String>，
-    // 它是 Compose 的内置类型，提供了一个可观察的状态持有者。
-    // val (value, setValue) = remember { mutableStateOf(default) }
-    // 对 value 的任何更改都将自动重新组合读取此状态的任何可组合函数。
-    val (text, setText) = remember { mutableStateOf("") }
+    // val (value, setValue) = remember { mutableStateOf(default) }，这个函数使用 remember 给自己添加内存，然后在内存中存储一个由 mutableStateOf 创建的 MutableState<String>。
+    // LingJie's Mark: (text, setText)语法糖参见Kotlin解构声明。
+    // LingJie's Mark: 下面代码的等效做法见①②③
+    val (text, setText) =
+        // LingJie's Mark: 使用 remember API 将对象存储在内存中。remember 既可用于存储可变对象，又可用于存储不可变对象。
+        remember {
+            // LingJie's Mark: mutableStateOf 会创建可观察的 MutableState<T>，后者是与 Compose 运行时集成的可观察类型。即如果 value 有任何变化，系统就会为读取 value 的所有可组合函数安排重组。
+            mutableStateOf("")
+        }
+    // ①
+//    var text by remember { mutableStateOf("") }
     Column {
         Row(
             modifier = Modifier
@@ -75,6 +82,8 @@ fun TodoItemInput(onItemComplete: (TodoItem) -> Unit) {
         ) {
             TodoInputText(
                 text = text,
+                // ②
+//                onTextChange = { text = it },
                 onTextChange = setText,
                 modifier = Modifier
                     .weight(1f)
@@ -84,6 +93,8 @@ fun TodoItemInput(onItemComplete: (TodoItem) -> Unit) {
             TodoEditButton(
                 onClick = {
                     onItemComplete(TodoItem(text))
+                    // ③
+//                    text = ""
                     setText("")
                 },
                 text = "Add",
