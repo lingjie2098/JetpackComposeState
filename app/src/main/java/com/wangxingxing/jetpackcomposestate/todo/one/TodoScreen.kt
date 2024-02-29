@@ -59,6 +59,7 @@ fun TodoScreen(
 }
 
 private fun randomTint(): Float {
+    // LingJie's Mark: 返回0.3~0.9之间的Float
     return Random.nextFloat().coerceIn(0.3f, 0.9f)
 }
 
@@ -76,16 +77,13 @@ fun TodoRow(
         horizontalArrangement = Arrangement.SpaceBetween // 子元素水平均匀分布
     ) {
         Text(text = todo.task)
-        // 随机透明度
-        // 但是每一次recomposition（重组）时，会重新生成透明度值
-        // val iconAlpha: Float = randomTint()
-        // 1.remember 给了组合函数一个内存空间
-        // 2.remember中表达式计算出来的值，将会保存在组合树中（composition tree），
-        // 并且只有在remember的键发生改变时，表达式才会重新计算。
-        // 3.我们可以将remember视为给函数提供了一个存储对象的内存空间，就像私有属性在对象中所做的那样。
+        // LingJie's Mark:
+        // 1、使用rememberSaveable代替remember解决列表超过一页上下滑动列表randomTint()会重新执行的问题。
+        // 2、key可以不加，key的作用参见https://blog.csdn.net/qq_39312146/article/details/130738223
         val iconAlpha: Float = remember(todo.id) { randomTint() }
         Icon(
             imageVector = todo.icon.imageVector,
+            // LingJie's Mark: 图标透明度。LocalContentColor隐式传参，会在后面CompositionLocal课程中讲。
             tint = LocalContentColor.current.copy(alpha = iconAlpha),
             contentDescription = stringResource(id = todo.icon.contentDescription)
         )
