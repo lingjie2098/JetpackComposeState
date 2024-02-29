@@ -39,6 +39,7 @@ fun TodoScreen(
             contentPadding = PaddingValues(top = 8.dp)
         ) {
             items(items = items) {
+                // LingJie's Mark: FIXME: 每次items变化，所有的TodoRow(...)都执行了一遍。
                 TodoRow(
                     todo = it,
                     onItemClicked = { onRemoveItem(it) },

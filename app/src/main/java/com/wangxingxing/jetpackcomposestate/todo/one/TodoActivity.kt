@@ -37,12 +37,14 @@ private fun TodoActivityScreen(todoViewModel: TodoViewModel) {
     TodoItem("Apply state", TodoIcon.Done),
     TodoItem("Build dynamic UIs", TodoIcon.Square)
 )*/
-    // observeAsState 观察 LiveData 并返回一个 State 对象，该对象在 LiveData 修改时更新。
-    // 给items的值由委托对象提供
-    // 通过State对LiveData进行观察监听，每一次LiveData的value值发生改变，都会更新State，就会引起组合树重组
-    // 界面也就更新了
+    // LingJie's Mark: observeAsState：开始观察todoItems，并通过State表示它的值。每次有新的值提交到LiveData时，State将被更新，引起每个State.value的调用重组（即每次都会重新调用TodoActivityScreen(...)）。使用①处代码也能实现同等效果。为何使用observeAsState，解释在：https://developer.android.google.cn/jetpack/compose/state?hl=zh-cn中的【其他受支持的状态类型】
     val items: List<TodoItem> by todoViewModel.todoItems.observeAsState(listOf())
+    // ①
+    /*val items = todoViewModel.todoItems.value ?: listOf()
+    val state = todoViewModel.todoItems.observeAsState(listOf())
+    Timber.tag("asdfsasadf").e("${state.value}")*/
     TodoScreen(
+        // LingJie's Mark: 是否发现，ViewModel中的状态和事件都放在了这里，不影响TodoScreen()函数里面的逻辑！！！
         items = items,
         onAddItem = { todoViewModel.addItem(it) },
         onRemoveItem = { todoViewModel.removeItem(it) }
