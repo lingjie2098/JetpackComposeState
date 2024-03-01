@@ -25,7 +25,7 @@ class TodoActivity : ComponentActivity() {
 
 @Composable
 private fun TodoActivityScreen(todoViewModel: TodoViewModel) {
-
+    // LingJie's Mark: 涉及ViewModel的状态全部提升到这里。
     TodoScreen(
         items = todoViewModel.todoItems,
         currentEditing = todoViewModel.currentEditItem,

@@ -15,10 +15,6 @@ import com.wangxingxing.jetpackcomposestate.TodoItem
  */
 
 class TodoViewModel : ViewModel() {
-
-    // 当前正在编辑的TodoItem的索引位置
-    private var currentEditPosition by mutableStateOf(-1)
-
     // LingJie's Mark: 与one/TodoViewModel.kt比对。
 
     // TodoItem集合只读
@@ -26,7 +22,8 @@ class TodoViewModel : ViewModel() {
     var todoItems = mutableStateListOf<TodoItem>()
         private set
 
-    // 当前正在编辑的TodoItem对象
+    // 当前正在编辑的TodoItem的索引位置
+    private var currentEditPosition by mutableStateOf(-1)
     val currentEditItem: TodoItem?
         get() = todoItems.getOrNull(currentEditPosition)
 
